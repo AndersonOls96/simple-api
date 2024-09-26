@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Produtos</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { margin-bottom: 20px; }
+        input, button { margin: 5px; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Cadastro de Produtos</h1>
+    <form id="produtoForm">
+        <input type="text" id="nome" placeholder="Nome do produto" required>
+        <input type="number" id="preco" placeholder="Preço" required>
+        <input type="text" id="descricao" placeholder="Descrição">
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <h2>Lista de Produtos</h2>
+    <ul id="listaProdutos"></ul>
+
+    <script>
+        const form = document.getElementById('produtoForm');
+        const listaProdutos = document.getElementById('listaProdutos');
+
+        // Função para carregar produtos
+        function carregarProdutos() {
+            axios.get('http://localhost:3000/produtos')
+                .then(response => {
+                    listaProdutos.innerHTML = '';
+                    response.data.forEach(produto => {
+                        const li = document.createElement('li');
+                        li.textContent = `Nome: ${produto.nome}, Preço: ${produto.preco}, Descrição: ${produto.descricao}`;
+                        listaProdutos.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar produtos:', error));
+        }
+
+        // Função para cadastrar um novo produto
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const preco = parseFloat(document.getElementById('preco').value);
+            const descricao = document.getElementById('descricao').value;
+
+            axios.post('http://localhost:3000/produtos', { nome, preco, descricao })
+                .then(response => {
+                    form.reset();
+                    carregarProdutos();
+                })
+                .catch(error => console.error('Erro ao cadastrar produto:', error));
+        });
+
+        // Carregar produtos ao iniciar
+        carregarProdutos();
+    </script>
+</body>
+</html>
